@@ -1,0 +1,112 @@
+.accounts-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.accounts-page h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+}
+
+.total-balance {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.total-balance h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: normal;
+  opacity: 0.9;
+}
+
+.balance-amount {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.table-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.accounts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.accounts-table th,
+.accounts-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.accounts-table th {
+  background-color: #2c3e50;
+  color: white;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+.accounts-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.account-type-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  background-color: #d6eaf8;
+  color: #1b4f72;
+}
+
+.balance {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #27ae60;
+}
+
+.no-data {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #7f8c8d;
+}
+
+.csv-format-info {
+  background-color: #ecf0f1;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+.csv-format-info h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.csv-format-info code {
+  background-color: #d5dbdb;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-family: monospace;
+}

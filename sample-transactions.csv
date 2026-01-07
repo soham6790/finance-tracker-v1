@@ -1,0 +1,11 @@
+date,description,amount,type,category
+2024-01-15,Salary Deposit,5000.00,credit,Income
+2024-01-16,Grocery Shopping,150.50,debit,Food
+2024-01-17,Electric Bill,85.00,debit,Utilities
+2024-01-18,Freelance Payment,800.00,credit,Income
+2024-01-19,Restaurant,45.75,debit,Food
+2024-01-20,Gas Station,60.00,debit,Transportation
+2024-01-21,Online Shopping,120.00,debit,Shopping
+2024-01-22,Interest Earned,12.50,credit,Income
+2024-01-23,Internet Bill,50.00,debit,Utilities
+2024-01-24,Coffee Shop,8.50,debit,Food
