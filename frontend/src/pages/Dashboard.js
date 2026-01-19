@@ -52,16 +52,16 @@ function Dashboard() {
       <div className="stats-grid">
         <div className="stat-card">
           <h3>Total Credits</h3>
-          <p className="stat-value credit">${transactionStats?.totalCredit?.toFixed(2) || '0.00'}</p>
+          <p className="stat-value credit">${(parseFloat(transactionStats?.totalCredit) || 0).toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <h3>Total Debits</h3>
-          <p className="stat-value debit">${transactionStats?.totalDebit?.toFixed(2) || '0.00'}</p>
+          <p className="stat-value debit">${(parseFloat(transactionStats?.totalDebit) || 0).toFixed(2)}</p>
         </div>
         <div className="stat-card">
           <h3>Balance</h3>
-          <p className={`stat-value ${transactionStats?.balance >= 0 ? 'credit' : 'debit'}`}>
-            ${transactionStats?.balance?.toFixed(2) || '0.00'}
+          <p className={`stat-value ${(parseFloat(transactionStats?.balance) || 0) >= 0 ? 'credit' : 'debit'}`}>
+            ${(parseFloat(transactionStats?.balance) || 0).toFixed(2)}
           </p>
         </div>
       </div>
