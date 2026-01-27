@@ -105,7 +105,7 @@ finance-tracker-v1/
 - `transaction_date` - Date of transaction
 - `description` - Transaction description
 - `amount` - Transaction amount (DECIMAL 10,2)
-- `type` - ENUM('debit', 'credit')
+- `type` - ENUM('Sale', 'Return', 'Payment','Fee','Adjustment')
 - `category` - Transaction category
 - `created_at` - Timestamp
 

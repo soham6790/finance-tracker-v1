@@ -115,7 +115,7 @@ CREATE TABLE transactions (
   transaction_date DATE NOT NULL,
   description VARCHAR(255),
   amount DECIMAL(10, 2) NOT NULL,
-  type ENUM('debit', 'credit') NOT NULL,
+  type ENUM('Sale', 'Return', 'Payment','Fee','Adjustment') NOT NULL,
   category VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
