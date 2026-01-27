@@ -7,15 +7,28 @@ function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [currentPage]);
 
   const fetchTransactions = async () => {
     try {
-      const response = await getTransactions();
+      setLoading(true);
+      const response = await getTransactions(currentPage, 10);
       setTransactions(response.data.data);
+      if (response.data.pagination) {
+        setPagination(response.data.pagination);
+      }
     } catch (error) {
       console.error('Error fetching transactions:', error);
     } finally {
@@ -25,7 +38,16 @@ function Transactions() {
 
   const handleUpload = async (file) => {
     await uploadTransactionCSV(file);
+    // Reset to first page after upload
+    setCurrentPage(1);
     fetchTransactions();
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const filteredTransactions = transactions.filter(t => {
@@ -62,46 +84,72 @@ function Transactions() {
       {loading ? (
         <div className="loading">Loading transactions...</div>
       ) : (
-        <div className="table-container">
-          <table className="transactions-table">
-            <thead>
-              <tr>
-                <th>Transaction Date</th>
-                <th>Post Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.length > 0 ? (
-                filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td>{formatDate(transaction.transaction_date)}</td>
-                    <td>{formatDate(transaction.post_date)}</td>
-                    <td>{transaction.description}</td>
-                    <td>{transaction.category}</td>
-                    <td>
-                      <span className={`type-badge ${transaction.type}`}>
-                        {transaction.type}
-                      </span>
-                    </td>
-                    <td className={`amount ${transaction.type}`}>
-                      ${parseFloat(transaction.amount).toFixed(2)}
+        <>
+          <div className="table-container">
+            <table className="transactions-table">
+              <thead>
+                <tr>
+                  <th>Transaction Date</th>
+                  <th>Post Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTransactions.length > 0 ? (
+                  filteredTransactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td>{formatDate(transaction.transaction_date)}</td>
+                      <td>{formatDate(transaction.post_date)}</td>
+                      <td>{transaction.description}</td>
+                      <td>{transaction.category}</td>
+                      <td>
+                        <span className={`type-badge ${transaction.type}`}>
+                          {transaction.type}
+                        </span>
+                      </td>
+                      <td className={`amount ${transaction.type}`}>
+                        ${parseFloat(transaction.amount).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="no-data">
+                      No transactions found. Upload a CSV file to get started.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="no-data">
-                    No transactions found. Upload a CSV file to get started.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={!pagination.hasPrevPage}
+              >
+                Previous
+              </button>
+              <span className="pagination-info">
+                Page {pagination.page} of {pagination.totalPages} 
+                {' '}({pagination.total} total transactions)
+              </span>
+              <button 
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={!pagination.hasNextPage}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <div className="csv-format-info">
