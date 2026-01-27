@@ -10,7 +10,7 @@ const api = axios.create({
 });
 
 // Transaction APIs
-export const getTransactions = (page = 1, limit = 10) => 
+export const getTransactions = (page = 1, limit = 50) => 
   api.get('/transactions', { params: { page, limit } });
 export const uploadTransactionCSV = (file) => {
   const formData = new FormData();

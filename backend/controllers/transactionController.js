@@ -7,7 +7,7 @@ const { convertToMySQLDate } = require('../util/dateUtil');
 const getTransactions = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 50;
     const offset = (page - 1) * limit;
 
     // Get total count for pagination metadata

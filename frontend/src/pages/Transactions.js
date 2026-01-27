@@ -10,7 +10,7 @@ function Transactions() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 50,
     total: 0,
     totalPages: 0,
     hasNextPage: false,
@@ -24,7 +24,7 @@ function Transactions() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const response = await getTransactions(currentPage, 10);
+      const response = await getTransactions(currentPage, 50);
       setTransactions(response.data.data);
       if (response.data.pagination) {
         setPagination(response.data.pagination);
