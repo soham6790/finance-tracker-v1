@@ -1,6 +1,7 @@
 const { pool } = require('../config/db');
 const fs = require('fs');
 const csv = require('csv-parser');
+const { convertToMySQLDate } = require('../util/dateUtil');
 
 // Get all transactions
 const getTransactions = async (req, res) => {
@@ -28,11 +29,13 @@ const uploadTransactionCSV = async (req, res) => {
       .on('data', (row) => {
         // Expected CSV format: date, description, amount, type, category
         transactions.push({
-          transaction_date: row.date || row.transaction_date,
-          description: row.description,
-          amount: parseFloat(row.amount),
-          type: row.type.toLowerCase(),
-          category: row.category || 'Uncategorized'
+          transaction_date: convertToMySQLDate(row.date || row['Transaction Date']),
+          post_date: convertToMySQLDate(row['Post Date']),
+          description: row.Description,
+          amount: parseFloat(row.Amount),
+          type: row.Type,
+          category: row.Category || 'Uncategorized',
+          memo: row.Memo || ''
         });
       })
       .on('end', async () => {
@@ -40,8 +43,8 @@ const uploadTransactionCSV = async (req, res) => {
           // Insert transactions into database
           for (const transaction of transactions) {
             await pool.query(
-              'INSERT INTO transactions (transaction_date, description, amount, type, category) VALUES (?, ?, ?, ?, ?)',
-              [transaction.transaction_date, transaction.description, transaction.amount, transaction.type, transaction.category]
+              'INSERT INTO transactions (transaction_date, post_date, description, amount, type, category, memo) VALUES (?, ?, ?, ?, ?, ?, ?)',
+              [transaction.transaction_date, transaction.post_date, transaction.description, transaction.amount, transaction.type, transaction.category, transaction.memo]
             );
           }
 
