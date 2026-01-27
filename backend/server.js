@@ -11,6 +11,12 @@ const accountRoutes = require('./routes/accounts');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy - enable if behind a reverse proxy (nginx, load balancer, etc.)
+// For local development, you can set this to true or false
+// For production behind a proxy, set to true or the number of proxies
+app.set('trust proxy', true); // Add this line
+
+
 // Rate limiting middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
