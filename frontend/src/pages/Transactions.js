@@ -51,8 +51,11 @@ function Transactions() {
         <label>Filter by Type: </label>
         <select value={filter} onChange={(e) => setFilter(e.target.value)}>
           <option value="all">All</option>
-          <option value="credit">Credit</option>
-          <option value="debit">Debit</option>
+          <option value="Sale">Sale</option>
+          <option value="Return">Return</option>
+          <option value="Payment">Payment</option>
+          <option value="Fee">Fee</option>
+          <option value="Adjustment">Adjustment</option>
         </select>
       </div>
 
@@ -63,7 +66,8 @@ function Transactions() {
           <table className="transactions-table">
             <thead>
               <tr>
-                <th>Date</th>
+                <th>Transaction Date</th>
+                <th>Post Date</th>
                 <th>Description</th>
                 <th>Category</th>
                 <th>Type</th>
@@ -75,6 +79,7 @@ function Transactions() {
                 filteredTransactions.map((transaction) => (
                   <tr key={transaction.id}>
                     <td>{formatDate(transaction.transaction_date)}</td>
+                    <td>{formatDate(transaction.post_date)}</td>
                     <td>{transaction.description}</td>
                     <td>{transaction.category}</td>
                     <td>
@@ -101,8 +106,8 @@ function Transactions() {
 
       <div className="csv-format-info">
         <h3>CSV Format</h3>
-        <p>Expected columns: <code>date, description, amount, type, category</code></p>
-        <p>Type should be either "credit" or "debit"</p>
+        <p>Expected columns: <code>Transaction Date, Post Date, Description, Amount, Type, Category</code></p>
+        <p>Type : "Sale", "Return", "Payment", "Fee", "Adjustment"</p>
       </div>
     </div>
   );
