@@ -3,11 +3,36 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const { convertToMySQLDate } = require('../util/dateUtil');
 
-// Get all transactions
+// Get all transactions with pagination
 const getTransactions = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM transactions ORDER BY transaction_date DESC');
-    res.json({ success: true, data: rows });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Get total count for pagination metadata
+    const [countResult] = await pool.query('SELECT COUNT(*) as total FROM transactions');
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    // Get paginated transactions
+    const [rows] = await pool.query(
+      'SELECT * FROM transactions ORDER BY transaction_date DESC LIMIT ? OFFSET ?',
+      [limit, offset]
+    );
+
+    res.json({ 
+      success: true, 
+      data: rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
   } catch (error) {
     console.error('Error fetching transactions:', error);
     res.status(500).json({ success: false, message: 'Error fetching transactions' });
