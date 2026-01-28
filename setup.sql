@@ -10,15 +10,16 @@ USE finance_tracker;
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  transaction_date DATE NOT NULL,
-  post_date DATE NOT NULL,
+  transaction_date DATE,
+  post_date DATE,
   description VARCHAR(255),
   amount DECIMAL(10, 2) NOT NULL,
-  type ENUM('Sale', 'Return', 'Payment','Fee','Adjustment') NOT NULL,
+  type ENUM('Sale', 'Return', 'Payment','Fee','Adjustment','BoFa'),
   category VARCHAR(100),
   memo VARCHAR(255),
+  reference_number VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_transaction_date (transaction_date),
+  INDEX idx_post_date (post_date),
   INDEX idx_type (type),
   INDEX idx_category (category)
 );

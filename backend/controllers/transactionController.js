@@ -52,15 +52,26 @@ const uploadTransactionCSV = async (req, res) => {
     fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', (row) => {
-        // Expected CSV format: date, description, amount, type, category
+        let transactionDate = convertToMySQLDate(row['Transaction Date']);
+        let postDate = convertToMySQLDate(row['Post Date'] || row['Posted Date']);
+        // Use post_date as fallback if transaction_date is missing (for BoFa)
+        if (!transactionDate) {
+          transactionDate = postDate;
+        }
+        // If still null, skip this transaction
+        if (!transactionDate) {
+          console.log('Skipping transaction with no dates:', row);
+          return; // Skip rows with no dates at all
+        }
         transactions.push({
-          transaction_date: convertToMySQLDate(row.date || row['Transaction Date']),
-          post_date: convertToMySQLDate(row['Post Date']),
-          description: row.Description,
+          transaction_date: transactionDate,
+          post_date: postDate,
+          description: row.Description || row['Payee'],
           amount: parseFloat(row.Amount),
-          type: row.Type,
+          type: !(row.Type) ? 'BoFa' : row.Type,
           category: row.Category || 'Uncategorized',
-          memo: row.Memo || ''
+          memo: row.Memo || row['Address'],
+          reference_number: row['Reference Number']
         });
       })
       .on('end', async () => {
@@ -68,8 +79,8 @@ const uploadTransactionCSV = async (req, res) => {
           // Insert transactions into database
           for (const transaction of transactions) {
             await pool.query(
-              'INSERT INTO transactions (transaction_date, post_date, description, amount, type, category, memo) VALUES (?, ?, ?, ?, ?, ?, ?)',
-              [transaction.transaction_date, transaction.post_date, transaction.description, transaction.amount, transaction.type, transaction.category, transaction.memo]
+              'INSERT INTO transactions (transaction_date, post_date, description, amount, type, category, memo, reference_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              [transaction.transaction_date, transaction.post_date, transaction.description, transaction.amount, transaction.type, transaction.category, transaction.memo, transaction.reference_number]
             );
           }
 

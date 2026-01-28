@@ -78,6 +78,7 @@ function Transactions() {
           <option value="Payment">Payment</option>
           <option value="Fee">Fee</option>
           <option value="Adjustment">Adjustment</option>
+          <option value="BoFa">BoFa</option>
         </select>
       </div>
 
@@ -95,6 +96,8 @@ function Transactions() {
                   <th>Category</th>
                   <th>Type</th>
                   <th>Amount</th>
+                  <th>Memo</th>
+                  <th>Reference Number</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +116,8 @@ function Transactions() {
                       <td className={`amount ${transaction.type}`}>
                         ${parseFloat(transaction.amount).toFixed(2)}
                       </td>
+                      <td>{transaction.memo}</td>
+                      <td>{transaction.reference_number}</td>
                     </tr>
                   ))
                 ) : (

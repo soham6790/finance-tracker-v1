@@ -24,9 +24,10 @@ const initDatabase = async () => {
         post_date DATE NOT NULL,
         description VARCHAR(255),
         amount DECIMAL(10, 2) NOT NULL,
-        type ENUM('Sale', 'Return', 'Payment','Fee','Adjustment') NOT NULL,
+        type ENUM('Sale', 'Return', 'Payment','Fee','Adjustment', 'BoFa') NOT NULL,
         category VARCHAR(100),
         memo VARCHAR(255),
+        reference_number VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);

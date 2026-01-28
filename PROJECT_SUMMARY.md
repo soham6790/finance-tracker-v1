@@ -103,10 +103,13 @@ finance-tracker-v1/
 ### Transactions Table
 - `id` - Auto-increment primary key
 - `transaction_date` - Date of transaction
+- `post_date` - Date transaction was posted
 - `description` - Transaction description
 - `amount` - Transaction amount (DECIMAL 10,2)
 - `type` - ENUM('Sale', 'Return', 'Payment','Fee','Adjustment')
 - `category` - Transaction category
+- `memo` - Transaction Memo or Address
+- `reference_number` - Transaction Reference number
 - `created_at` - Timestamp
 
 ### Accounts Table
