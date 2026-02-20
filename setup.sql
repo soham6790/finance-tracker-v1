@@ -30,11 +30,15 @@ CREATE TABLE IF NOT EXISTS accounts (
   account_name VARCHAR(255) NOT NULL,
   account_number VARCHAR(50),
   statement_date DATE NOT NULL,
+  transaction_date DATE,
+  description VARCHAR(255),
+  amount DECIMAL(10, 2),
   balance DECIMAL(10, 2) NOT NULL,
   account_type VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_account_name (account_name),
   INDEX idx_statement_date (statement_date),
+  INDEX idx_transaction_date (transaction_date),
   INDEX idx_account_type (account_type)
 );
 
