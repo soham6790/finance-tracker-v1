@@ -31,7 +31,10 @@ const uploadAccountCSV = async (req, res) => {
           account_name: row.account_name,
           account_number: row.account_number,
           statement_date: row.statement_date,
-          balance: parseFloat(row.balance),
+          balance: parseFloat(row['Current Balance']) || parseFloat(row['Running Bal.']),
+          transaction_date: row.date,
+          description: row.description,
+          amount: parseFloat(row.amount),
           account_type: row.account_type || 'Checking'
         });
       })
@@ -40,8 +43,8 @@ const uploadAccountCSV = async (req, res) => {
           // Insert accounts into database
           for (const account of accounts) {
             await pool.query(
-              'INSERT INTO accounts (account_name, account_number, statement_date, balance, account_type) VALUES (?, ?, ?, ?, ?)',
-              [account.account_name, account.account_number, account.statement_date, account.balance, account.account_type]
+              'INSERT INTO accounts (account_name, account_number, statement_date, transaction_date, description, amount, balance, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+              [account.account_name, account.account_number, account.statement_date, account.transaction_date, account.description, account.amount, account.balance, account.account_type]
             );
           }
 
