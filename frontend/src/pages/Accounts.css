@@ -79,6 +79,27 @@
   color: #27ae60;
 }
 
+.description-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.amount {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.amount.credit {
+  color: #27ae60;
+}
+
+.amount.debit {
+  color: #e74c3c;
+}
+
 .no-data {
   text-align: center;
   color: #7f8c8d;
@@ -109,4 +130,18 @@
   padding: 0.2rem 0.5rem;
   border-radius: 3px;
   font-family: monospace;
+}
+
+.format-section {
+  margin-bottom: 1.5rem;
+}
+
+.format-section:last-child {
+  margin-bottom: 0;
+}
+
+.format-section h4 {
+  margin: 0 0 0.5rem 0;
+  color: #34495e;
+  font-size: 1rem;
 }
