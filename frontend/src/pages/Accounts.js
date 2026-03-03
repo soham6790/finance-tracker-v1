@@ -6,6 +6,8 @@ import './Accounts.css';
 function Accounts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterName, setFilterName] = useState('All');
+  const [accountNames, setAccountNames] = useState([]);
 
   useEffect(() => {
     fetchAccounts();
@@ -14,7 +16,12 @@ function Accounts() {
   const fetchAccounts = async () => {
     try {
       const response = await getAccounts();
-      setAccounts(response.data.data);
+      const data = response.data.data || [];
+      setAccounts(data);
+
+      // populate unique account names for the filter dropdown
+      const names = Array.from(new Set(data.map((a) => a.account_name).filter(Boolean))).sort();
+      setAccountNames(names);
     } catch (error) {
       console.error('Error fetching accounts:', error);
     } finally {
@@ -32,8 +39,20 @@ function Accounts() {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  // compute filtered accounts based on selected account name
+  const filteredAccounts = filterName === 'All'
+    ? accounts
+    : accounts.filter((a) => a.account_name === filterName);
+
   const getTotalBalance = () => {
-    return accounts.reduce((sum, account) => sum + parseFloat(account.balance), 0);
+    return filteredAccounts.reduce((sum, account) => {
+      const val = parseFloat(account.balance);
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilterName(e.target.value);
   };
 
   return (
@@ -44,6 +63,17 @@ function Accounts() {
         onUpload={handleUpload}
         uploadType="Account"
       />
+
+      {/* Filter dropdown */}
+      <div className="filter-row" style={{ marginTop: '12px', marginBottom: '12px' }}>
+        <label htmlFor="account-filter" style={{ marginRight: '8px' }}>Filter by Account Name:</label>
+        <select id="account-filter" value={filterName} onChange={handleFilterChange}>
+          <option value="All">All Accounts</option>
+          {accountNames.map((name) => (
+            <option key={name} value={name}>{name}</option>
+          ))}
+        </select>
+      </div>
 
       {loading ? (
         <div className="loading">Loading accounts...</div>
@@ -69,8 +99,8 @@ function Accounts() {
                 </tr>
               </thead>
               <tbody>
-                {accounts.length > 0 ? (
-                  accounts.map((account) => (
+                {filteredAccounts.length > 0 ? (
+                  filteredAccounts.map((account) => (
                     <tr key={account.id}>
                       <td>{account.account_name}</td>
                       <td>{account.account_number || 'N/A'}</td>
