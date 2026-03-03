@@ -45,11 +45,32 @@ function Accounts() {
     : accounts.filter((a) => a.account_name === filterName);
 
   const getTotalBalance = () => {
-    return filteredAccounts.reduce((sum, account) => {
-      const val = parseFloat(account.balance);
+    // group filteredAccounts by account_name
+    const groups = filteredAccounts.reduce((acc, row) => {
+      const name = row.account_name || 'Unknown';
+      if (!acc[name]) acc[name] = [];
+      acc[name].push(row);
+      return acc;
+    }, {});
+
+    // for each group pick the row with the latest transaction_date
+    const latestRows = Object.values(groups).map((rows) =>
+      rows.reduce((latest, row) => {
+        const latestDate = new Date(latest.transaction_date || 0);
+        const rowDate = new Date(row.transaction_date || 0);
+        return rowDate >= latestDate ? row : latest;
+      })
+    );
+
+    return latestRows.reduce((sum, row) => {
+      const val = parseFloat(row.balance);
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
   };
+
+  const totalBalanceLabel = filterName === 'All'
+    ? 'Total Balance Across All Accounts'
+    : `Latest Balance — ${filterName}`;
 
   const handleFilterChange = (e) => {
     setFilterName(e.target.value);
@@ -80,7 +101,7 @@ function Accounts() {
       ) : (
         <>
           <div className="total-balance">
-            <h2>Total Balance Across All Accounts</h2>
+            <h2>{totalBalanceLabel}</h2>
             <p className="balance-amount">${getTotalBalance().toFixed(2)}</p>
           </div>
 
