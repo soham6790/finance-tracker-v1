@@ -43,10 +43,19 @@ const detectCSVFormat = (row) => {
   if (row['DATE'] || row['TRANSACTION TYPE'] || row['CURRENT BALANCE']) {
     return 'DCU';
   }
+
+  // Check if it's BOFA format (has Date and Running Bal. columns)
+  const hasBofaDate = row.Date || row['Date'];
+  const hasBofaRunningBal = row['Running Bal.'] || row['Running Bal'];
+  if (hasBofaDate && hasBofaRunningBal) {
+    return 'BOFA';
+  }
+
   // Check if it's standard format (has account_name, account_number, etc.)
   if (row.account_name || row.account_number) {
     return 'STANDARD';
   }
+
   return 'UNKNOWN';
 };
 

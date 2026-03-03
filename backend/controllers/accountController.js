@@ -2,6 +2,7 @@ const { pool } = require('../config/db');
 const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
+const { Readable } = require('stream');
 const { convertToMySQLDate, parseAmount, detectCSVFormat } = require('../util/csvUtil');
 
 // Get all accounts
@@ -36,7 +37,18 @@ const uploadAccountCSV = async (req, res) => {
     let csvFormat = null;
     let latestDate = null;
 
-    fs.createReadStream(filePath)
+    // Detect if this is a BOFA statement by inspecting the first non-empty line
+    const rawContent = fs.readFileSync(filePath, 'utf8');
+    const allLines = rawContent.split(/\r?\n/);
+    const firstNonEmptyLine = allLines.find(line => line.trim().length > 0) || '';
+    const isBofaStatement = firstNonEmptyLine.startsWith('Description,,Summary Amt.');
+
+    // For BOFA, skip the first 6 lines (summary preamble) and start from header at row 7
+    const csvInput = isBofaStatement
+      ? Readable.from(allLines.slice(6).join('\n'))
+      : fs.createReadStream(filePath);
+
+    csvInput
       .pipe(csv())
       .on('data', (row) => {
         // Detect format on first row
@@ -67,6 +79,36 @@ const uploadAccountCSV = async (req, res) => {
             balance: currentBalance,
             account_type: 'Checking' // Default, can be overridden
           });
+        } else if (csvFormat === 'BOFA') {
+          // BOFA CSV format after preamble skip: Date, Description, Amount, Running Bal.
+          const transactionDate = convertToMySQLDate(row.Date || row['Date']);
+          const description = row.Description || row['Description'] || '';
+          const rawAmount = row.Amount || row['Amount'];
+          const rawRunningBal = row['Running Bal.'] || row['Running Bal'];
+
+          // Skip rows where Amount is empty (e.g., beginning balance row)
+          if (!rawAmount || String(rawAmount).trim() === '') {
+            return;
+          }
+
+          const amount = parseAmount(rawAmount);
+          const currentBalance = parseAmount(rawRunningBal);
+
+          // Track latest date for statement_date
+          if (transactionDate && (!latestDate || transactionDate > latestDate)) {
+            latestDate = transactionDate;
+          }
+
+          accounts.push({
+            account_name: accountNameFromFile,
+            account_number: null,
+            statement_date: null, // Will be set to latestDate in 'end' handler
+            transaction_date: transactionDate,
+            description: description,
+            amount: amount,
+            balance: currentBalance,
+            account_type: 'Checking'
+          });
         } else if (csvFormat === 'STANDARD') {
           // Standard CSV format: account_name, account_number, statement_date, balance, account_type
           accounts.push({
@@ -94,7 +136,7 @@ const uploadAccountCSV = async (req, res) => {
           }
 
           // Update statement_date for DCU format accounts with the latest date
-          if (csvFormat === 'DCU') {
+          if (csvFormat === 'DCU' || csvFormat === 'BOFA') {
             // Use latest date, or first transaction date, or current date as fallback
             const statementDate = latestDate || 
                                  accounts.find(a => a.transaction_date)?.transaction_date || 
