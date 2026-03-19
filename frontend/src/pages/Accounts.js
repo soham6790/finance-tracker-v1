@@ -8,6 +8,8 @@ function Accounts() {
   const [loading, setLoading] = useState(true);
   const [filterName, setFilterName] = useState('All');
   const [accountNames, setAccountNames] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   useEffect(() => {
     fetchAccounts();
@@ -74,7 +76,14 @@ function Accounts() {
 
   const handleFilterChange = (e) => {
     setFilterName(e.target.value);
+    setCurrentPage(1);
   };
+
+  const totalPages = Math.ceil(filteredAccounts.length / rowsPerPage);
+  const paginatedAccounts = filteredAccounts.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   return (
     <div className="accounts-page">
@@ -105,6 +114,32 @@ function Accounts() {
             <p className="balance-amount">${getTotalBalance().toFixed(2)}</p>
           </div>
 
+          {filteredAccounts.length > 0 && (
+            <div className="pagination">
+              <button
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+              >
+                &laquo; Previous
+              </button>
+              <span>Page {currentPage} of {totalPages} &nbsp;|&nbsp; {filteredAccounts.length} rows</span>
+              <button
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next &raquo;
+              </button>
+              <select
+                value={rowsPerPage}
+                onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+              >
+                {[10, 25, 50, 100].map((n) => (
+                  <option key={n} value={n}>{n} / page</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="table-container">
             <table className="accounts-table">
               <thead>
@@ -120,8 +155,8 @@ function Accounts() {
                 </tr>
               </thead>
               <tbody>
-                {filteredAccounts.length > 0 ? (
-                  filteredAccounts.map((account) => (
+                {paginatedAccounts.length > 0 ? (
+                  paginatedAccounts.map((account) => (
                     <tr key={account.id}>
                       <td>{account.account_name}</td>
                       <td>{account.account_number || 'N/A'}</td>
@@ -130,10 +165,10 @@ function Accounts() {
                       <td className="description-cell" title={account.description || ''}>
                         {account.description || 'N/A'}
                       </td>
-                      <td className={account.amount !== null && account.amount !== undefined 
+                      <td className={account.amount !== null && account.amount !== undefined
                         ? (parseFloat(account.amount) >= 0 ? 'amount credit' : 'amount debit')
                         : 'amount'}>
-                        {account.amount !== null && account.amount !== undefined 
+                        {account.amount !== null && account.amount !== undefined
                           ? `$${parseFloat(account.amount).toFixed(2)}`
                           : 'N/A'}
                       </td>
